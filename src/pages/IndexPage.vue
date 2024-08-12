@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import VivaGraph from 'components/VivaGraph.vue';
+import VivaGraph from 'src/components/VivaGraph.vue';
 
 defineOptions({
   name: 'IndexPage'

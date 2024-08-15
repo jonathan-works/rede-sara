@@ -1,18 +1,13 @@
 <template>
-  <div class="fit">
     <VivaGraphRender ref="vgRender" :graph="graphStore.graph" :graphics="graphStore.graphics" />
-    <!-- <input type="text" id="input_cnpj" name="input_cnpj" size="18" value="" onkeydown="menu_input_cnpj(this)" onfocusin="graphStore.ativaAtalhos(false)" onfocusout="graphStore.ativaAtalhos(true);" title="Digite  CNPJ, Razão Social, Nome Fantasia, CPF de sócio ou Nome de sócio e pressione Enter. Os nomes podem ter acentuação ou estar com letras minúsculas, pois o texto é convertido em maiúsculas sem acentuação. CNPJS e CPFs podem ter pontos, traços ou barras. Para buscar por Unidade Gestora, coloque UG_NNNNNN, onde NNNNNN é o código da UG. A busca por endereço, por telefone ou por email ainda não foi implementada."> -->
-    <SmartSearchField label="Pesquisa" @search="onSearch"></SmartSearchField>
-  </div>
 </template>
-buscar
 <script setup>
 import Viva from 'vivagraphjs';
 import VivaGraphRender from 'src/components/VivaGraphRender.vue';
 import { onMounted, ref } from 'vue';
 import { useGraphStore } from 'src/stores/graph.store.js'
 import { useMenuStore } from 'src/stores/menu.store.js'
-import SmartSearchField from 'src/components/SmartSearchField.vue'
+
 import { useDialogPluginComponent } from 'quasar';
 
 
@@ -1484,12 +1479,6 @@ function drop_handler(ev) {
 
 graphStore.main();
 graphStore.start();
-
-function onSearch(palavraChave){
-    const camada = '1';
-
-    graphStore.buscar(camada, palavraChave)
-}
 </script>
 
 

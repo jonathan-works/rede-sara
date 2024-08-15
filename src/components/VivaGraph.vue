@@ -5,7 +5,7 @@
     <SmartSearchField label="Pesquisa" @search="onSearch"></SmartSearchField>
   </div>
 </template>
-
+buscar
 <script setup>
 import Viva from 'vivagraphjs';
 import VivaGraphRender from 'src/components/VivaGraphRender.vue';
@@ -142,7 +142,7 @@ function menu_localiza_CaminhosEntreitensComNotas(criterioCaminhos) {
 		}
 	}
 	if (criterioCaminhos) {
-		let dicItens = menu_incluirCamada_dicItemNota();
+		let dicItens = graphStore.menu_incluirCamada_dicItemNota();
 		if (Object.keys(dicItens).length==0) { // (dicItens) { dicItens == true??
 			alert('Para usar esta opção de caminhos, os itens devem ter Anotações para identificar os grupos. Para adicionar uma anotação, clique com o botão da roda.');
 			return false;
@@ -207,47 +207,6 @@ function menu_localiza_itensComNotas(bMensagem) {
 		alertify.error('Não foi encontrado item com Nota');
 	}
 } //.function menu_localiza_itensComNotas
-
-function dadosEmHtmlPJ(d, noData) {
-	//for (var i of Object.entries(graphStore.json)) {
-	//	texto += '<b>' + i[0] + ':<b> ' + i[1] + '<br> '; }
-	var ht = '';
-	ht += "<b>CNPJ:</b> " + d['cnpj_formatado'] + " - " + d['matriz_filial'] + "<br>";
-	ht += "<b>Razão Social:</b> "+d['razao_social'] +  "<br>";
-	ht += "<b>Nome Fantasia:</b> "+d['nome_fantasia'] + "<br>";
-	ht += "<b>Data início atividades:</b> "+d['data_inicio_atividades']+"<br>";
-	ht += "<b>Situação:</b> "+d['situacao_cadastral']+" <b>Data Situação:</b> "+d['data_situacao_cadastral']+"<br>";
-	ht += "<b>Motivo situação:</b> "+d['motivo_situacao_cadastral'] +"<br>";
-	ht += "<b>Natureza jurídica:</b> "+d['natureza_juridica'] +"<br>";
-	ht += "<b>Porte empresa:</b> "+d['porte_empresa'] +"<br>";
-	ht += "<b>Opção MEI:</b> "+d['opcao_mei'] +"<br>";
-	ht += "<b>Capital Social:</b> R$ "+d['capital_social'] +"<br>";
-	ht += "<b>Endereço:</b> "+d['endereco'] +"<br>";
-	if (d['uf']!='EX') {
-		ht += "<b>Municipio:</b> "+d['municipio']+"/"+d['uf'] + " - <b>CEP:</b>" + d['cep'] +"<br>";
-	} else {
-		ht += "<b>Municipio:</b> "+d['municipio']+"<br>";
-		ht += "<b>País:</b> "+d['pais']+"<br>";
-	}
-	ht += "<b>Telefone:</b> "+d['ddd1']+" "+ d['telefone1']+"  "+d['ddd2']+" "+d['telefone2'] +"<br>";
-	ht += "<b>Fax:</b> "+d['ddd_fax']+" "+d['fax'] +"<br>";
-	ht += "<b>Email:</b> "+d['correio_eletronico'] +"<br>";
-
-	ht += "<b>CNAE:</b> "+d['cnae_fiscal'] +"<br>";
-	ht += "<b>CNAE Secundária:</b> "+graphStore.cortastr(d['cnae_secundaria'], 250) +"<br>"; 
-	if (noData.nota) {
-		ht += "<br><b>Nota:</b> "+ noData.nota + "<br>";
-	}
-	camposPJ = ['cnpj', 'cnpj_formatado', 'matriz_filial', 'razao_social', 'nome_fantasia', 'data_inicio_atividades', 'situacao_cadastral',
-				'data_situacao_cadastral', 'motivo_situacao_cadastral', 'natureza_juridica', 'cnae_fiscal', 'cnae_secundaria', 'porte_empresa', 'opcao_mei',
-				'endereco', 'municipio', 'uf', 'cep', 'nm_cidade_exterior', 'nome_pais', 'nm_cidade_exterior', 'pais',
-				'ddd1', 'telefone1', 'ddd2', 'telefone2', 'ddd_fax', 'fax', 'correio_eletronico', 'capital_social'
-				];
-	for (let k of camposPJ) {
-		d[k] = '';
-	}
-	return ht;
-} //.dadosEmHtmlPJ
 
 function menu_importarJsonArquivo(evt, tipo) {
 	menuStore.menuOnClick();
@@ -320,7 +279,7 @@ function exportaArquivoServidor(arquivo) {
 	//https://stackoverflow.com/questions/5587973/javascript-upload-file
 	let formData = new FormData();
 	formData.append("arquivo", arquivo);
-	fetch(base + 'arquivo_upload/', {method: "POST", body: formData})
+	fetch(graphStore.base + 'arquivo_upload/', {method: "POST", body: formData})
 		.then(
 			function(response) {
 			  if (response.status !== 200) {
@@ -365,7 +324,7 @@ function menu_exportaJSONServidor(bSoSelecionados, bReescreveNoLink) {
 	}
 	var idArquivoServidor = '';
 	
-	var url = base + 'arquivos_json_upload/'
+	var url = graphStore.base + 'arquivos_json_upload/'
 	if (bReescreveNoLink) { //xxe
 		idArquivoServidor = String(window.location).split('/').pop();
 		if (!confirm('o arquivo ' + idArquivoServidor + ' será ATUALIZADO no servidor. A versão anterior não poderá ser recuperada. Deseja prosseguir?')) {
@@ -395,7 +354,7 @@ function menu_exportaJSONServidor(bSoSelecionados, bReescreveNoLink) {
 				if (data.nomeArquivoServidor) {
 					if (!bReescreveNoLink) {
 						alert('O arquivo foi carregado no servidor com o nome: ' + data.nomeArquivoServidor + '\n' + 'Será aberto uma janela com o link, que poderá ser compartilhado.\nAtenção: QUALQUER PESSOA COM O LINK poderá ABRIR ou APAGAR o arquivo no servidor. \nOs arquivos no servidor PODERÃO SER APAGADOS sem aviso prévio. Faça uma cópia local com a opção no menu Salvar/Abrir>Arquivo>Salvar Arquivo Json.');
-						var novaJanela=window.open(base + "grafico_no_servidor/" + data.nomeArquivoServidor);
+						var novaJanela=window.open(graphStore.base + "grafico_no_servidor/" + data.nomeArquivoServidor);
 					} else {
 						alert('O arquivo foi carregado no servidor com o nome: ' + data.nomeArquivoServidor + '\nOs arquivos no servidor PODERÃO SER APAGADOS sem aviso prévio. Faça uma cópia local com a opção no menu Salvar/Abrir>Arquivo>Salvar Arquivo Json.');					
 					}
@@ -430,10 +389,10 @@ function menu_importaJSONServidor(idArquivoServidor, bNaoConfirma, bApaga) {
 		return;
 	}
 	var url = '';
-	if (idArquivoServidor.startsWith(base+'grafico_no_servidor/')) {
-		idArquivoServidor = idArquivoServidor.substr(base.length+'grafico_no_servidor/'.length);
+	if (idArquivoServidor.startsWith(graphStore.base+'grafico_no_servidor/')) {
+		idArquivoServidor = idArquivoServidor.substr(graphStore.base.length+'grafico_no_servidor/'.length);
 	} 
-	url = base + 'arquivos_json/' + idArquivoServidor;
+	url = graphStore.base + 'arquivos_json/' + idArquivoServidor;
 
 	if (bApaga) {
 		if (!bNaoConfirma) {
@@ -529,23 +488,6 @@ function reinsereComNovoId(id, idNovo) {
 	}
 	graphStore.layout.setNodePosition(idNovo, posicao.x, posicao.y);
 } //.function reinsereComNovoId
-
-function menu_incluirCamada_dicItemNota() { //cria um dicionário por nota com lista de itens com essa nota. usado para enviar para o servidor para a rotina de caminhos por nota (extra, intra grupos)
-	var dicNotaArray = {};
-	for (let idx of graphStore.idNosSelecionados) {
-		var nota = graphStore.graph.getNode(idx).data.nota;
-		if (nota) {
-			if (dicNotaArray[nota]) {
-				arrayaux = dicNotaArray[nota];
-				arrayaux.push(idx);
-				dicNotaArray[nota] = JSON.parse(JSON.stringify(arrayaux));
-			} else {
-				dicNotaArray[nota] = [idx,];
-			}
-		}
-	}
-	return dicNotaArray;
-} //.menu_incluirCamada_dicItemNota
 
 function menu_nomeAba() {
 	var nome = prompt('Digite o nome para esta aba', document.title);
@@ -1223,7 +1165,7 @@ function inserir_lista(entrada, bNaoConfirma) {
 		var idinlista = [...cnpjsids];
 		document.body.style.cursor = 'wait';
 		let bodyjson = JSON.stringify(idinlista);
-		var url =  base + 'grafojson/cnpj/0/' + idinlista[0];
+		var url =  graphStore.base + 'grafojson/cnpj/0/' + idinlista[0];
 		if (idinlista.length>1) {
 			url += ' (' + idinlista.length + ' itens)';
 		}
@@ -1544,10 +1486,9 @@ graphStore.main();
 graphStore.start();
 
 function onSearch(palavraChave){
-    const tipo = 'cnpj';
     const camada = '1';
 
-    graphStore.buscar(tipo, camada, palavraChave)
+    graphStore.buscar(camada, palavraChave)
 }
 </script>
 

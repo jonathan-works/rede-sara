@@ -49,18 +49,33 @@ export const useGraphStore = defineStore('graph-store', {
     abaFilha: null,
     usuarioLocal: null,
 
+    tipo: 'cnpj',
+    base: '/rede/',
     baseImagem:'/imagem/',
     menu: null,
-    buscaResponse: null
   }),
   actions: {
-    buscar(tipo, camada, palavraChave){
+    buscar(camada, palavraChave){
       this.setLoading(true);
-      return BuscaService.buscar(tipo, camada, palavraChave).then((mock) => {
-        this.buscaResponse = mock;
-        this.inserirJson(mock,'');
+      return BuscaService.buscar(this.tipo, camada, palavraChave).then((data) => {
+        this.inserirJson(data,'');
         this.setLoading(false);
-        return mock;
+        return data;
+      }).catch((error) => {
+        console.log('erro:', error)
+        this.setLoading(false);
+        throw error;
+      });
+    },
+    buscarPorId(tipo, id){
+      this.setLoading(true);
+      return BuscaService.buscarPorId(this.tipo, id).then((data) => {
+        // if (response.status !== 200) {
+        //   mensagemErroHttp(response);
+        //   return;
+        // }
+        this.setLoading(false);
+        return data;
       }).catch((error) => {
         console.log('erro:', error)
         this.setLoading(false);
@@ -592,7 +607,7 @@ export const useGraphStore = defineStore('graph-store', {
     menu_abrirNovaAba(idno, bNosSelecionados) {
       var novaJanela=null;
       if ((!idno)&&(!bNosSelecionados)) {
-        novaJanela = window.open(base); // + '?pula_mensagem=sim');
+        novaJanela = window.open(this.base); // + '?pula_mensagem=sim');
         novaJanela.focus(); 
         this.abaFilha = novaJanela;
         return;
@@ -603,7 +618,7 @@ export const useGraphStore = defineStore('graph-store', {
         if ((this.idNosSelecionados.size==1) && ([ 'PF_', 'PJ_'].includes(this.idnoSelecionado.substr(0,3)))){ 
           var camada = prompt('Quantidade de camadas para abrir ' + this.idnoSelecionado + ' em uma nova aba:','1');
           if (!camada) return;
-          novaJanela = window.open(base + 'grafico/' + String(camada) + '/' + this.idnoSelecionado) ;
+          novaJanela = window.open(this.base + 'grafico/' + String(camada) + '/' + this.idnoSelecionado) ;
           if (novaJanela) {
             novaJanela.focus();
             this.abaFilha = novaJanela;
@@ -618,7 +633,7 @@ export const useGraphStore = defineStore('graph-store', {
         novaJanela.focus();
         return;
       } else if (idno.startsWith('AR_')) {
-        var url = base + 'abrir_arquivo' ; //+ idno.substr(3);
+        var url = this.base + 'abrir_arquivo' ; //+ idno.substr(3);
         //novaJanela=window.open(strUrl);
         if (!this.usuarioLocal) {
           if (idno.includes('/') || idno.includes('\\') ) {
@@ -877,7 +892,7 @@ export const useGraphStore = defineStore('graph-store', {
         // textoPrompt +=  ' <b>ATENÇÃO:</b> A busca por nome está mais flexível. Agora o padrão é a busca por parte nos nomes, não é mais necessário nomes completos.'
       }
       
-      //todo
+      //todo - entender a importancia, mas segundo o Jonathas esse modal não será implementado
       // notify.prompt( 'RedeCNPJ - Digite CNPJ/CPF/Nome', textoPrompt , itensDefault
       //            , function(evt, cnpjs) {   //quando se pressiona cancel, esta rotina não é chamada. Usando vazio para retornar um cnpj de teste
       // 				this.inserirDefault = cnpjs;
@@ -1414,15 +1429,15 @@ export const useGraphStore = defineStore('graph-store', {
       }
       var url;
       if (acaoAlternativa) {
-        url = base + 'envia_json/' + acaoAlternativa;
+        url = this.base + 'envia_json/' + acaoAlternativa;
       } else {
         if (!comentario) {
-          comentario = prompt('Digite um comentário para os dados inseridos na base local:', 'rede');
+          comentario = prompt('Digite um comentário para os dados inseridos na this.base local:', 'rede');
         }
         if (!comentario) {
           return;
         }
-        url = base + 'json_para_base/' + encodeURIComponent(comentario);
+        url = this.base + 'json_para_base/' + encodeURIComponent(comentario);
       }
     
       fazFetch(url, jsonDados);
@@ -1438,7 +1453,7 @@ export const useGraphStore = defineStore('graph-store', {
             response.json().then(data => {
               document.body.style.cursor = 'default';
               if (data.retorno) {
-                const textoMensagem = acaoAlternativa ? 'Dados enviados.' : 'Os dados foram inseridos na base local.';
+                const textoMensagem = acaoAlternativa ? 'Dados enviados.' : 'Os dados foram inseridos na this.base local.';
                 this.exibe_mensagem_sucesso_erro(textoMensagem, data.mensagem);
               } else {
                 notify.error('Aconteceu um erro. ' + data.mensagem);
@@ -1619,18 +1634,18 @@ export const useGraphStore = defineStore('graph-store', {
         notify.error('Não há itens na área de transferência.');
         return false;	
       }
-      if (jsonDados.no.length==0) {
+      try {
+        this.inserirJson(jsonDados, ' Colou itens da área de transferência. ', true);
+      } catch (e) {
         notify.error('Não há itens para colar.');
-        return false;
+        return;
       }
-    
-      this.inserirJson(jsonDados, ' Colou itens da área de transferência. ', true);
     },
 
     menu_copiaClip() { //xx5
       var jsonDados;
       jsonDados = this.getRedeNosLigacoes(true);
-      if (jsonDados.no.length==0) {
+      if (jsonDados?.no?.length==0) {
         notify.error('Não há itens para copiar.');
         return false;
       }
@@ -1651,7 +1666,7 @@ export const useGraphStore = defineStore('graph-store', {
       
       if (!setNos && !bSoSelecionados) { // || setNos) {
         this.graph.forEachNode( 
-          function(node) {
+          (node) => {
             var nodedata = JSON.parse(JSON.stringify(node.data));
             if (!bSemPosicao) {
               nodedata['posicao'] = this.layout.getNodePosition(node.id);
@@ -2224,8 +2239,8 @@ export const useGraphStore = defineStore('graph-store', {
         form.target = "_blank";
         form.method = "POST";
       form.rel = 'opener'; //evitar erro de window.opener is null quando clica no mapa para pedir dados
-        //form.action = base + 'selecao_de_itens/' ; 
-      form.action = url.startsWith('http') ? url : base + url;
+        //form.action = this.base + 'selecao_de_itens/' ; 
+      form.action = url.startsWith('http') ? url : this.base + url;
         form.style.display = "none";
       var input = document.createElement("input");
       input.type = "hidden";
@@ -2378,10 +2393,10 @@ export const useGraphStore = defineStore('graph-store', {
     
       if (bNovaJanela) {
         if (idNo) {
-          window.open(base+'consulta_cnpj/?cnpj='+idNo.substr(3));
+          window.open(this.base+'consulta_cnpj/?cnpj='+idNo.substr(3));
         } else {
           var listaIds = [...this.idNosSelecionados].filter(function(id) {return id.startsWith('PJ_');}).slice(0,100).join('; ');
-          window.open(base+'consulta_cnpj/?cnpj='+listaIds);
+          window.open(this.base+'consulta_cnpj/?cnpj='+listaIds);
         }
         return;
       }
@@ -2389,18 +2404,18 @@ export const useGraphStore = defineStore('graph-store', {
       if (!idin) return;
       /*
       if (bNovaJanela && idin.startsWith('PJ_')) {
-        window.open(base+'consulta_cnpj/?cnpj='+idin.substr(3));
+        window.open(this.base+'consulta_cnpj/?cnpj='+idin.substr(3));
         return;
       }*/
     
-      function mostraResultado(idin, ht) {
+      const mostraResultado = (idin, ht) => {
         if (bNovaJanela) { 
             //var win = window.open('/rede/dados_janela/'+this.idnoSelecionado, this.idnoSelecionado,'resizable,scrollbars,status,menubar=no, toolbar=no, personalbar=no, location=no, titlebar=0, height=500, width=400');
             var win = window.open('', idin,'resizable,scrollbars,status,menubar=no, toolbar=no, personalbar=no, location=no, titlebar=0, height=500, width=400');
             win.document.body.innerHTML = "<!DOCTYPE html><html><head><title>" + idin + "</title></head><body  >" + ht + "</body></html>";
         } else {
-          ativaAtalhos(false);
-          notify.alert("Dados de "+idin, ht, function(){ativaAtalhos(true);});
+          this.ativaAtalhos(false);
+          notify.alert("Dados de "+idin, ht, ()=> this.ativaAtalhos(true));
         }	
       }
       
@@ -2446,8 +2461,8 @@ export const useGraphStore = defineStore('graph-store', {
         }
       }
     
-      //var url = base + 'dadosjson/' + idin;
-      var url = base + 'dadosjson/'; 
+      //var url = this.base + 'dadosjson/' + idin;
+      var url = this.base + 'dadosjson/'; 
       //link pode ter caractere, como barra, que bagunça o app.route do flask, por isso os dados vão pelo body. outra opção, ignorar pedido de dadosjson de LI_
       /*
       if ([ 'LI_', 'ID_'].includes(idin.substr(0,3))) { 
@@ -2458,24 +2473,20 @@ export const useGraphStore = defineStore('graph-store', {
       } */
       url += encodeURIComponent(idin.replaceAll('/',' ').replaceAll('?', ' '));
       // talvez isto é redundante para PF, pois os dados de pep, etc, já terão sido carregados. Só tem sentido se existisse atualizasse online de algum dado
-      fetch(url, {method: 'post', body:JSON.stringify({'idin':idin}), headers: {"Content-type": "application/json"}, cache: "no-store"}) //, mode: 'cors',})
-        .then(
-        function(response) {
-          if (response.status !== 200) {
-          mensagemErroHttp(response);
-          return;
-          }
-          response.json().then(function(data) {
-          var texto = "";
+
+      // fetch(url, {method: 'post', body:JSON.stringify({'idin':idin}), headers: {"Content-type": "application/json"}, cache: "no-store"}) //, mode: 'cors',})
+      this.buscarPorId(this.tipo, idin)  
+      .then((response) => {
+          const data = response
           this.json = data;
     
           // if (data) { // se data for {}. é não nulo no javascript
           if (Object.keys(data).length) {
             if (idin.startsWith('PJ_')) {
-              ht = dadosEmHtmlPJ(data, noData);
+              ht = this.dadosEmHtmlPJ(data, noData);
             } // else {
               //ht += noData;
-            htadicional = ''
+            let htadicional = ''
             for (const [key, value] of Object.entries(data)) {
               if (['id'].includes(key)) {
                 continue;
@@ -2497,13 +2508,52 @@ export const useGraphStore = defineStore('graph-store', {
             }
           } 
           mostraResultado(idin, ht);
-          });
         }
-        )
-        .catch(function(err) {
+      )
+      .catch((err) => {
         console.log('Fetch Error :-S', err);
         notify.error('Aconteceu um erro (Fetch error ' + err + ')');
-        });
+      });
+    },
+    dadosEmHtmlPJ(d, noData) {
+      //for (var i of Object.entries(this.json)) {
+      //	texto += '<b>' + i[0] + ':<b> ' + i[1] + '<br> '; }
+      var ht = '';
+      ht += "<b>CNPJ:</b> " + d['cnpj_formatado'] + " - " + d['matriz_filial'] + "<br>";
+      ht += "<b>Razão Social:</b> "+d['razao_social'] +  "<br>";
+      ht += "<b>Nome Fantasia:</b> "+d['nome_fantasia'] + "<br>";
+      ht += "<b>Data início atividades:</b> "+d['data_inicio_atividades']+"<br>";
+      ht += "<b>Situação:</b> "+d['situacao_cadastral']+" <b>Data Situação:</b> "+d['data_situacao_cadastral']+"<br>";
+      ht += "<b>Motivo situação:</b> "+d['motivo_situacao_cadastral'] +"<br>";
+      ht += "<b>Natureza jurídica:</b> "+d['natureza_juridica'] +"<br>";
+      ht += "<b>Porte empresa:</b> "+d['porte_empresa'] +"<br>";
+      ht += "<b>Opção MEI:</b> "+d['opcao_mei'] +"<br>";
+      ht += "<b>Capital Social:</b> R$ "+d['capital_social'] +"<br>";
+      ht += "<b>Endereço:</b> "+d['endereco'] +"<br>";
+      if (d['uf']!='EX') {
+        ht += "<b>Municipio:</b> "+d['municipio']+"/"+d['uf'] + " - <b>CEP:</b>" + d['cep'] +"<br>";
+      } else {
+        ht += "<b>Municipio:</b> "+d['municipio']+"<br>";
+        ht += "<b>País:</b> "+d['pais']+"<br>";
+      }
+      ht += "<b>Telefone:</b> "+d['ddd1']+" "+ d['telefone1']+"  "+d['ddd2']+" "+d['telefone2'] +"<br>";
+      ht += "<b>Fax:</b> "+d['ddd_fax']+" "+d['fax'] +"<br>";
+      ht += "<b>Email:</b> "+d['correio_eletronico'] +"<br>";
+    
+      ht += "<b>CNAE:</b> "+d['cnae_fiscal'] +"<br>";
+      ht += "<b>CNAE Secundária:</b> "+this.cortastr(d['cnae_secundaria'], 250) +"<br>"; 
+      if (noData.nota) {
+        ht += "<br><b>Nota:</b> "+ noData.nota + "<br>";
+      }
+      const camposPJ = ['cnpj', 'cnpj_formatado', 'matriz_filial', 'razao_social', 'nome_fantasia', 'data_inicio_atividades', 'situacao_cadastral',
+            'data_situacao_cadastral', 'motivo_situacao_cadastral', 'natureza_juridica', 'cnae_fiscal', 'cnae_secundaria', 'porte_empresa', 'opcao_mei',
+            'endereco', 'municipio', 'uf', 'cep', 'nm_cidade_exterior', 'nome_pais', 'nm_cidade_exterior', 'pais',
+            'ddd1', 'telefone1', 'ddd2', 'telefone2', 'ddd_fax', 'fax', 'correio_eletronico', 'capital_social'
+            ];
+      for (let k of camposPJ) {
+        d[k] = '';
+      }
+      return ht;
     },
 
     // menu_ligar_novo(idNovo, descricaoNovo, bNaoLigar, bLigarEntre, bInverterLIgacaoPadrao, posicao) {
@@ -2936,15 +2986,64 @@ export const useGraphStore = defineStore('graph-store', {
         camada = this.camadaIdExpandido[idref] + 1;
       }
       this.camadaIdExpandido = {}; //reseta, expansão gradativa só de 1 item por vez.
-      menu_incluirCamada(idin, camada);
-      //if ((tipo=='cnpj')&&(this.graph.getNode(idref))) { //verifica se nó existe para evitar inconsistência quando busca item inexistente na base local
-      if (this.graph.getNode(idref)) { //verifica se nó existe para evitar inconsistência quando busca item inexistente na base local
+      this.menu_incluirCamada(idin, camada);
+      //if ((tipo=='cnpj')&&(this.graph.getNode(idref))) { //verifica se nó existe para evitar inconsistência quando busca item inexistente na this.base local
+      if (this.graph.getNode(idref)) { //verifica se nó existe para evitar inconsistência quando busca item inexistente na this.base local
         this.camadaIdExpandido[idref]=camada;
       }
     }, 
     menu_incluirCamada(idin, camada, tipo = 'cnpj', bNaoConfirma) {
       // Verifica se idin está vazio e se nenhum nó está selecionado
-      if (!idin.trim() && !this.idnoSelecionado) return;
+      if (!idin?.trim() && !this.idnoSelecionado) return;
+
+
+      //todo - é o mesmo método do consulta no
+      const fazFetch = (url, idin, bodyjsonIn) => {
+        document.body.style.cursor = 'wait';
+        const bodyjson = bodyjsonIn || (idin ? JSON.stringify([idin]) : JSON.stringify([...this.idNosSelecionados]));
+        const qitens = idin ? 1 : this.idNosSelecionados.size;
+    
+        url += encodeURIComponent((idin ? idin : this.idnoSelecionado).replace(/[\?\/]/g, ' '));
+        if (qitens > 1) {
+          url += ` (${qitens} itens)`;
+        }
+    
+        fetch(url, {
+          method: 'post',
+          body: bodyjson,
+          headers: { "Content-type": "application/json" },
+          cache: "no-store"
+        })
+          .then(response => {
+            if (response.status !== 200) {
+              this.mensagemErroHttp(response);
+              return;
+            }
+            return response.json();
+          })
+          .then(data => {
+            document.body.style.cursor = 'default';
+            if (data.no.length) {
+              const textoInserir = camada > 1 ? ((tipo === 'cnpj') ? `Camada ${camada}. ` : `${tipo} em camada ${camada}. `) : '';
+              this.inserirJson(data, textoInserir, bNaoConfirma, tipo === 'caminhos');
+            } else if (!bAbriuAbaLink) {
+              const errorMsg = isNumeric(idin.replace(/[\.\-\//]/g, '').trim()) || idin.includes('*')
+                ? `Não encontrou ${idin} na this.base. ${data.mensagem}`
+                : `Não encontrou o item ou novos itens que satisfaçam os parâmetros da consulta. ${data.mensagem}`;
+              notify.error(errorMsg);
+            }
+          })
+          .catch(err => {
+            document.body.style.cursor = 'default';
+            console.error('Fetch Error :-S', err);
+            notify.error(`Aconteceu um erro (Fetch error ${err})`);
+          })
+          .finally(() => {
+            if (document.activeElement.id === "input_cnpj") {
+              document.getElementById("botao_inserir").focus();
+            }
+          });
+      }
     
       let url = '';
       let bAbriuAbaLink = false;
@@ -2952,7 +3051,7 @@ export const useGraphStore = defineStore('graph-store', {
       let sidSelecionadosInicial = new Set([...this.idNosSelecionados]);
     
       // Ajusta o conjunto inicial de IDs selecionados
-      if (idin.trim()) {
+      if (idin?.trim()) {
         sidSelecionadosInicial = new Set([idin.trim()]);
       }
     
@@ -3000,56 +3099,9 @@ export const useGraphStore = defineStore('graph-store', {
           return;
         }
     
-        url = base + 'grafojson/' + tipo + '/' + camada + '/';
-        bodyj = tipo.startsWith('caminhos') ? JSON.stringify([[...this.idNosSelecionados]]) : JSON.stringify(menu_incluirCamada_dicItemNota());
+        url = this.base + 'grafojson/' + tipo + '/' + camada + '/';
+        bodyj = tipo.startsWith('caminhos') ? JSON.stringify([[...this.idNosSelecionados]]) : JSON.stringify(this.menu_incluirCamada_dicItemNota());
         fazFetch(url, idin, bodyj);
-      }
-    
-      function fazFetch(url, idin, bodyjsonIn) {
-        document.body.style.cursor = 'wait';
-        const bodyjson = bodyjsonIn || (idin ? JSON.stringify([idin]) : JSON.stringify([...this.idNosSelecionados]));
-        const qitens = idin ? 1 : this.idNosSelecionados.size;
-    
-        url += encodeURIComponent((idin ? idin : this.idnoSelecionado).replace(/[\?\/]/g, ' '));
-        if (qitens > 1) {
-          url += ` (${qitens} itens)`;
-        }
-    
-        fetch(url, {
-          method: 'post',
-          body: bodyjson,
-          headers: { "Content-type": "application/json" },
-          cache: "no-store"
-        })
-          .then(response => {
-            if (response.status !== 200) {
-              this.mensagemErroHttp(response);
-              return;
-            }
-            return response.json();
-          })
-          .then(data => {
-            document.body.style.cursor = 'default';
-            if (data.no.length) {
-              const textoInserir = camada > 1 ? ((tipo === 'cnpj') ? `Camada ${camada}. ` : `${tipo} em camada ${camada}. `) : '';
-              this.inserirJson(data, textoInserir, bNaoConfirma, tipo === 'caminhos');
-            } else if (!bAbriuAbaLink) {
-              const errorMsg = isNumeric(idin.replace(/[\.\-\//]/g, '').trim()) || idin.includes('*')
-                ? `Não encontrou ${idin} na base. ${data.mensagem}`
-                : `Não encontrou o item ou novos itens que satisfaçam os parâmetros da consulta. ${data.mensagem}`;
-              notify.error(errorMsg);
-            }
-          })
-          .catch(err => {
-            document.body.style.cursor = 'default';
-            console.error('Fetch Error :-S', err);
-            notify.error(`Aconteceu um erro (Fetch error ${err})`);
-          })
-          .finally(() => {
-            if (document.activeElement.id === "input_cnpj") {
-              document.getElementById("botao_inserir").focus();
-            }
-          });
       }
     
       function dialogoParametrosLink() {
@@ -3076,7 +3128,7 @@ export const useGraphStore = defineStore('graph-store', {
               notify.error('O número de camadas é limitado em 10.');
             } else {
               ativaAtalhos(true);
-              url = `${base}grafojson/links/${camada}/${numeroItens}/${valorMinimo}/${valorMaximo}/`;
+              url = `${this.base}grafojson/links/${camada}/${numeroItens}/${valorMinimo}/${valorMaximo}/`;
               fazFetch(url, idin);
               dlgLink.remove();
             }
@@ -3087,6 +3139,22 @@ export const useGraphStore = defineStore('graph-store', {
     
         document.getElementById('dlgLink_camadas').value = camada;
       }
+    },
+    menu_incluirCamada_dicItemNota() { //cria um dicionário por nota com lista de itens com essa nota. usado para enviar para o servidor para a rotina de caminhos por nota (extra, intra grupos)
+      var dicNotaArray = {};
+      for (let idx of this.idNosSelecionados) {
+        var nota = this.graph.getNode(idx).data.nota;
+        if (nota) {
+          if (dicNotaArray[nota]) {
+            arrayaux = dicNotaArray[nota];
+            arrayaux.push(idx);
+            dicNotaArray[nota] = JSON.parse(JSON.stringify(arrayaux));
+          } else {
+            dicNotaArray[nota] = [idx,];
+          }
+        }
+      }
+      return dicNotaArray;
     },
     menu_links_google(bAbrePalavrasChaves) {
       // Manda termos de busca para o servidor, que fará uma chamada ao google e retornará uma lista de nós e de ligações.
@@ -3141,9 +3209,9 @@ export const useGraphStore = defineStore('graph-store', {
       }
     
       if (['LI_', 'AR_'].includes(termos.substr(0, 3))) {
-        url = base + 'busca_google?link=' + encodeURIComponent(termos);
+        url = this.base + 'busca_google?link=' + encodeURIComponent(termos);
       } else {
-        url = base + 'busca_google?pag=' + encodeURIComponent(this.paginaBuscaGoogle[termos]) + '&q=' + encodeURIComponent(termos);
+        url = this.base + 'busca_google?pag=' + encodeURIComponent(this.paginaBuscaGoogle[termos]) + '&q=' + encodeURIComponent(termos);
       }
       
       url += '&palavras_chave=' + (bAbrePalavrasChaves ? kpalavras : '0');

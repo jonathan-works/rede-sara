@@ -79,9 +79,47 @@ const buscar = async (tipo, camada, palavraChave) => {
                 ],
                 "mensagem": ""
             });
-        }, 3000);
+        }, 1000);
     })
-    
 }
 
-export default { buscar };
+const buscarPorId = async (tipo, id) => {
+    //const data await useApi(`/busca/${tipo}/${id}`)
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve({
+                "matriz_filial": "Matriz",
+                "nome_fantasia": "",
+                "situacao_cadastral": "02 - Ativa",
+                "data_situacao_cadastral": "02/04/2008",
+                "motivo_situacao_cadastral": "00-SEM MOTIVO",
+                "pais": "",
+                "data_inicio_atividades": "02/04/2008",
+                "cnae_fiscal": "7020400-Atividades de consultoria em gestão empresarial, exceto consultoria técnica específica",
+                "cep": "04548004",
+                "uf": "SP",
+                "municipio": "SAO PAULO",
+                "ddd1": "11",
+                "telefone1": "38767600",
+                "ddd2": "",
+                "telefone2": "",
+                "ddd_fax": "",
+                "fax": "",
+                "correio_eletronico": "daniel@precisaocontabil.com.br",
+                "cnpj": "09514356000118",
+                "razao_social": "EGEU CONSULTORIA E GESTAO EMPRESARIAL LTDA",
+                "natureza_juridica": "2062-Sociedade Empresária Limitada",
+                "porte_empresa": "03-Empresa de pequeno porte",
+                "capital_social": "1.000,00",
+                "opcao_mei": "",
+                "cnae_secundaria": "8219999-Preparação de documentos e serviços especializados de apoio administrativo não especificados anteriormente",
+                "endereco": "AVENIDA DR. CARDOSO DE MELO, 1340, ANDAR 6, VILA OLIMPIA",
+                "id": "PJ_09514356000118",
+                "cnpj_formatado": "09.514.356/0001-18"
+            });
+        }, 1000);
+    })
+}
+
+export default { buscar, buscarPorId };

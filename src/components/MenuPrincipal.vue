@@ -35,12 +35,12 @@
                 Desfaz última inserção de itens (CTRL+Z)
             </q-tooltip>
         </q-btn>
-        <q-btn outline color="white" text-color="grey-10" icon="fa fa-user-plus" @click="menuStore.menu_inserir(null, event.shiftKey, event.ctrlKey)">
+        <q-btn outline color="white" text-color="grey-10" icon="fa fa-user-plus" @click="menuStore.menu_inserir">
             <q-tooltip>
                 Inserir CNPJ ou CPF do Banco de Dados (Tecla I)
             </q-tooltip>
         </q-btn>
-        <q-btn outline color="white" text-color="grey-10" icon="fa fa-newspaper" @click="menuStore.menu_dados(event.shiftKey)">
+        <q-btn outline color="white" text-color="grey-10" icon="fa fa-newspaper" @click="menuStore.menu_dados">
             <q-tooltip>
                 Exibir Dados do Item (D). SHIFT+Click ou SHIFT+D abre os dados de CNPJ em nova aba.
             </q-tooltip>
@@ -56,12 +56,12 @@
                 Procura caminhos entre itens selecionados no gráfico
             </q-tooltip>
         </q-btn>
-        <q-btn outline color="white" text-color="grey-10" icon="fa fa-folder-open" @click="menuStore.menu_botaoAbre(event.shiftKey)">
+        <q-btn outline color="white" text-color="grey-10" icon="fa fa-folder-open" @click="menuStore.menu_botaoAbre">
             <q-tooltip>
                 Adiciona última visualização salva no navegador com o botão ao lado. Pressionando SHIFT pode se escolher o nome do conjunto.
             </q-tooltip>
         </q-btn>
-        <q-btn outline color="white" text-color="grey-10" icon="fa fa-save" @click="menuStore.menu_botaoSalva(event.shiftKey)">
+        <q-btn outline color="white" text-color="grey-10" icon="fa fa-save" @click="menuStore.menu_botaoSalva">
             <q-tooltip>
                 Salva a visualização atual no navegador. Pressionando SHIFT pode se definir nome do conjunto.
             </q-tooltip>
@@ -76,18 +76,19 @@
                 Abre endereços de cnpjs com OpenStreetMap
             </q-tooltip>
         </q-btn>
-        <q-btn outline color="white" text-color="grey-10" icon="fa fa-paste" @click="menuStore.menu_colaClip()">
+        <q-btn outline color="white" text-color="grey-10" icon="fa fa-paste" @click="menuStore.menu_colaClip">
             <q-tooltip>
                 (CTRL+V) COLA itens da Área de Transferência da RedeCNPJ de outra aba
             </q-tooltip>
         </q-btn>
+        <!-- todo -->
+        <!-- <button id="drag_area"  ondragstart="drag_handler(event);" draggable="true" onclick="javascript:menu_copiaClip();" ondblclick="javascript:menu_copiaItensParaOutraAba(event.shiftKey, true);" title="COPY: CLICK SIMPLES para copiar para a Área de Transferência da RedeCNPJ (CTRL+C), para ser colada em outra aba. Dê CLICK DUPLO para COPIAR os itens selecionados para NOVA ABA já aberta por SHIFT+DUPLO CLICK, tecla A ou SHIFT+A; SHIFT+DUPLO CLICK copia os itens para uma NOVA ABA; DRAG: Arraste este botão para outra Aba de Rede para copiar os itens selecionados."><i class="fa fa-copy"></i>/<i class="fa fa-hand-rock" aria-hidden="true"></i></button> -->
         <q-btn outline color="white" text-color="grey-10" icon="fa fa-copy" >
             <q-tooltip>
                 COPY: CLICK SIMPLES para copiar para a Área de Transferência da RedeCNPJ (CTRL+C), para ser colada em outra aba. Dê CLICK DUPLO para COPIAR os itens selecionados para NOVA ABA já aberta por SHIFT+DUPLO CLICK, tecla A ou SHIFT+A; SHIFT+DUPLO CLICK copia os itens para uma NOVA ABA; DRAG: Arraste este botão para outra Aba de Rede para copiar os itens selecionados.
             </q-tooltip>
         </q-btn>
-        <!-- <button id="drag_area"  ondragstart="drag_handler(event);" draggable="true" onclick="javascript:menu_copiaClip();" ondblclick="javascript:menu_copiaItensParaOutraAba(event.shiftKey, true);" title="COPY: CLICK SIMPLES para copiar para a Área de Transferência da RedeCNPJ (CTRL+C), para ser colada em outra aba. Dê CLICK DUPLO para COPIAR os itens selecionados para NOVA ABA já aberta por SHIFT+DUPLO CLICK, tecla A ou SHIFT+A; SHIFT+DUPLO CLICK copia os itens para uma NOVA ABA; DRAG: Arraste este botão para outra Aba de Rede para copiar os itens selecionados."><i class="fa fa-copy"></i>/<i class="fa fa-hand-rock" aria-hidden="true"></i></button> -->
-        <q-btn outline color="white" text-color="grey-10" icon="fa fa-trash" @click="menuStore.menu_excluirTudo()">
+        <q-btn outline color="white" text-color="grey-10" icon="fa fa-trash" @click="menuStore.menu_excluirTudo">
             <q-tooltip>
                 Apaga TODOS os itens da tela. Para apagar apenas os itens selecionados, pressione a tecla DELETE. Para desfazer a última inserção, pressione CTRL+Z.
             </q-tooltip>

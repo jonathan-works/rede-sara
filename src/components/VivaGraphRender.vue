@@ -12,6 +12,7 @@ const graphStore = useGraphStore();
 const gh = ref(null);
 
 const updateRenderer = () => {
+  
   graphStore.layout = Viva.Graph.Layout.forceDirected(graphStore.graph, {
 		   springLength : graphStore.springLength, //170, //140, //80,
 		   springCoeff : 0.0002, //0.0002,
@@ -24,7 +25,9 @@ const updateRenderer = () => {
 			layout: graphStore.layout,
 			container  : gh.value
 		});
+    
 	graphStore.renderer.run();
+
 	graphStore.geom = Viva.Graph.geom();
 };
 

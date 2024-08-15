@@ -2,10 +2,10 @@ import Viva from 'vivagraphjs';
 import { defineStore } from 'pinia';
 import { LoadingBar, Loading } from 'quasar';
 import BuscaService from 'src/service/busca.service.js'
-import userNotify from 'src/composable/UserNotify.js';
-import useDialog from 'src/composable/UserDialog.js';
+import useNotify from 'src/composable/UseNotify.js';
+import useDialog from 'src/composable/UseDialog.js';
 
-const notify = userNotify();
+const notify = useNotify();
 const dialog = useDialog();
 export const useGraphStore = defineStore('graph-store', {
   state: () => ({
@@ -698,6 +698,45 @@ export const useGraphStore = defineStore('graph-store', {
 
 
     ajustaAmbiente() {
+      var alertifyfake = {
+        'prompt':(titulo, texto, valor, func1, func2) => {
+          menuStore.menuOnClick(); //firefox no android, não está fechando o menu
+          var resp = 	prompt(titulo+'\n'+texto.replaceAll('<b>','').replaceAll('</b>',''), valor);
+          if (!(resp===null)) {
+            func1(null, resp);
+          } else {
+            func2();
+          };
+        },
+        'confirm':(titulo, texto, func1,func2) => {
+          menuStore.menuOnClick();
+          var resp = confirm(titulo + '\n' + texto);
+          if (resp) {
+            func1();
+          } else {
+            func2();
+          }
+        },
+        'alert':function(titulo, texto, func) {
+          menuStore.menuOnClick();
+          //texto = texto.replace(/<b>/g, '').replace(/<\/b>/g, '').replace(/<br>/g, '; ')
+          texto = texto.replace(/<b>/g, '').replace(/<\/b>/g, '').replace(/<br>/g, '\n')
+          setTimeout(function(){ alert(titulo + '\n\n' + texto);}, 500);	
+          func();
+        },
+        'success':function(texto) {
+          menuStore.menuOnClick();
+          setTimeout(function(){ alert(texto);}, 500);
+        },
+        'warning':function(texto) {
+          menuStore.menuOnClick();
+          setTimeout(function(){ alert('ATENÇÃO!!! ' + texto); }, 500);
+        },
+        'error':function(texto) {
+          menuStore.menuOnClick();
+          setTimeout(function(){ alert('ERRO!!! ' + texto); }, 500);
+        }
+      } //.alertifyfake
       // var menu = document.querySelector('.menu');
       if (this.mobile) { 
       //if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)){ //mobile
@@ -3165,6 +3204,175 @@ export const useGraphStore = defineStore('graph-store', {
     main() {
       this.ajustaAmbiente();
       this.geom = Viva.Graph.geom();
+      this.graph = Viva.Graph.graph();
+      this.graphics = Viva.Graph.View.svgGraphics();
+      
+      this.AreaSelecaoRetangular = {
+        Setup:function() {
+          /*seleção retangular */
+          var multiSelectOverlay;
+          document.addEventListener('keydown', function(e) {
+            if (e.which === 17 && !multiSelectOverlay) { // ctrl key
+              multiSelectOverlay = this.AreaSelecaoRetangular.startMultiSelect(graph, this.renderer, this.layout);
+            }
+            if (e.which != 17 && multiSelectOverlay) { // pressionou outro botão (corrige problema quando se pressiona CTRL+botão para outro comando, que o tipo de cursor não mudava para o padrão
+              multiSelectOverlay.destroy();
+              multiSelectOverlay = null;
+            }
+      
+          });
+          document.addEventListener('keyup', function(e) {
+            if (e.which === 17 && multiSelectOverlay) {
+              multiSelectOverlay.destroy();
+              multiSelectOverlay = null;
+            }
+          });
+        }, startMultiSelect: function(graph, renderer, layout) {
+          var graphics = renderer.getGraphics();
+          var domOverlay = document.querySelector('.graph-overlay');
+          var overlay = this.AreaSelecaoRetangular.createOverlay(domOverlay);
+          overlay.onAreaSelected(handleAreaSelected);
+          
+          return overlay;
+      
+          function handleAreaSelected(area) {
+            // For the sake of this demo we are using silly O(n) implementation.
+            // Could be improved with spatial indexing if required.
+            var topLeft = this.graphics.transformClientToGraphCoordinates({
+              x: area.x,
+              y: area.y
+            });
+      
+          var bottomRight = this.graphics.transformClientToGraphCoordinates({
+            x: area.x + area.width,
+            y: area.y + area.height
+          });
+      
+          this.graph.forEachNode(higlightIfInside);
+          renderer.rerender();
+      
+          return;
+      
+          function higlightIfInside(node) {
+            var nodeUI = this.graphics.getNodeUI(node.id);
+            if (isInside(node.id, topLeft, bottomRight)) {
+              this.selecionaNoid(node.id, true, true);
+            }
+          }
+           
+          function isInside(nodeId, topLeft, bottomRight) {
+            var nodePos = layout.getNodePosition(nodeId);
+            return ((topLeft.x < nodePos.x) && (nodePos.x < bottomRight.x) &&
+              (topLeft.y < nodePos.y) && (nodePos.y < bottomRight.y));
+          }
+          }
+        }, createOverlay: function(overlayDom) {
+          var selectionClasName = 'graph-selection-indicator';
+          var selectionIndicator = overlayDom.querySelector('.' + selectionClasName);
+          if (!selectionIndicator) {
+            selectionIndicator = document.createElement('div');
+            selectionIndicator.className = selectionClasName;
+            overlayDom.appendChild(selectionIndicator);
+          }	
+      
+          var notify = [];
+          var dragndrop = Viva.Graph.Utils.dragndrop(overlayDom);
+          var selectedArea = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+          };
+          var startX = 0;
+          var startY = 0;
+      
+          dragndrop.onStart(function(e) {
+            startX = selectedArea.x = e.clientX;
+            startY = selectedArea.y = e.clientY;
+            selectedArea.width = selectedArea.height = 0;
+            updateSelectedAreaIndicator();
+            selectionIndicator.style.display = 'block';
+          });
+      
+          dragndrop.onDrag(function(e) {
+            recalculateSelectedArea(e);
+            updateSelectedAreaIndicator();
+            notifyAreaSelected();
+          });
+      
+          dragndrop.onStop(function() {
+            selectionIndicator.style.display = 'none';
+          });
+      
+          overlayDom.style.display = 'block';
+      
+          return {
+            onAreaSelected: function(cb) {
+              notify.push(cb);
+            },
+            destroy: function () {
+              overlayDom.style.display = 'none';
+              dragndrop.release();
+            }
+          };
+      
+          function notifyAreaSelected() {
+            notify.forEach(function(cb) {
+              cb(selectedArea);
+            });
+          }
+      
+          function recalculateSelectedArea(e) {
+            var bcr = document.getElementById('principal').getBoundingClientRect();
+            selectedArea.width = Math.abs(e.clientX - startX);
+            selectedArea.height = Math.abs(e.clientY - startY);
+            selectedArea.x = Math.min(e.clientX, startX)- bcr.x;
+            selectedArea.y = Math.min(e.clientY, startY)- bcr.y;
+          }
+      
+          function updateSelectedAreaIndicator() {
+            var bcr = document.getElementById('principal').getBoundingClientRect();
+            selectionIndicator.style.left = (selectedArea.x) + 'px';
+            selectionIndicator.style.top = (selectedArea.y) + 'px';
+            selectionIndicator.style.width = selectedArea.width + 'px';
+            selectionIndicator.style.height = selectedArea.height + 'px';
+          }	
+        }
+      }
+
+      this.markerSeta = Viva.Graph.svg('marker')
+        .attr('id', 'Triangle')
+        .attr('viewBox', '0 0 10 10')
+        .attr('refX', '10')
+        .attr('refY', '5')
+        .attr('markerUnits', 'strokeWidth')
+        .attr('markerWidth', '10')
+        .attr('markerHeight', '5')
+        .attr('orient', 'auto')
+        .attr('stroke', 'gray')
+        .attr('fill', 'gray');
+
+      this.markerSeta.append('path').attr('d', 'M 0 0 L 10 5 L 0 10 z');
+
+      this.graphics.getSvgRoot().id = 'principal_svg';
+
+
+      var defs = this.graphics.getSvgRoot().append('defs');
+      defs.innerHTML = ' \
+        <filter id="filtroPB"> \
+        <feColorMatrix \
+          type="matrix" \
+          values="0 1 0 0 0 \
+              0 1 0 0 0 \
+              0 1 0 0 0 \
+              0 1 0 1 0 "/> \
+        </filter>\
+        <filter id="filtroNegativo"> \
+        <feColorMatrix type="matrix" \
+        values="-1  0  0 0 0  0 -1  0 0 0 0 0 -1 0 0 1 1 1 0 0"/>\
+        </filter> \
+        ';
+      defs.append(this.markerSeta);
     
       if (!this.mobile) {
         //Ajusta região para drag and drop de arquivo ou do excel
@@ -3202,6 +3410,7 @@ export const useGraphStore = defineStore('graph-store', {
       }
     },
     start(){
+
       this.graphics.node((node) => {
         // This time it's a group of elements: http://www.w3.org/TR/SVG/struct.html#Groups
         let ui = Viva.Graph.svg('g');
@@ -3339,7 +3548,7 @@ export const useGraphStore = defineStore('graph-store', {
         };
         ui.ondblclick = (event) => {
           if (event.which == 1) {
-            reativarLayout(); //click pausa layout, se for duplo click, já pode reativar
+            this.reativarLayout(); //click pausa layout, se for duplo click, já pode reativar
             event.preventDefault();
             if (node.id.startsWith('AR_') || node.id.startsWith('LI_')) {
               menu_abrirNovaAba(node.id);
@@ -3476,6 +3685,12 @@ export const useGraphStore = defineStore('graph-store', {
             elemento.attr('text-anchor','start'); */
           }
       })
+    },
+    reativarLayout() {
+      if (this.layout_suspenso) {
+        this.renderer.resume();
+        this.layout_suspenso = false;
+      }
     },
     setLoading(isLoading){
       if(isLoading){

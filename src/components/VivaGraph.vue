@@ -11,20 +11,14 @@ import Viva from 'vivagraphjs';
 import VivaGraphRender from 'src/components/VivaGraphRender.vue';
 import { onMounted, ref } from 'vue';
 import { useGraphStore } from 'src/stores/graph.store.js'
+import { useMenuStore } from 'src/stores/menu.store.js'
 import SmartSearchField from 'src/components/SmartSearchField.vue'
 import { useDialogPluginComponent } from 'quasar';
-//var graphGenerator = Viva.Graph.generator();
-//var graph = graphGenerator.grid(10, 10);
-//debugger
-//var graphStore = useGraphStore();
+
+
 const graphStore = useGraphStore();
+const menuStore = useMenuStore();
 const vgRender = ref(null);
-
-
-graphStore.graph = Viva.Graph.graph();
-graphStore.graphics = Viva.Graph.View.svgGraphics();
-// var graph = Viva.Graph.graph();
-// var graphics = Viva.Graph.View.svgGraphics();
 
 
 var mock = {"bBaseFullTextSearch": 0, "bBaseLocal": 1, "bBaseReceita": 1, "bMenuInserirInicial": true, "bbusca_chaves": false, "bgrafico_no_servidor": false, "btextoEmbaixoIcone": true, "camada": 0, "chrome": true, "cpfcnpj": "", "firefox": false, "geocode_max": 10, "idArquivoServidor": "", "inserirDefault": "", "itensFlag": ["situacao_fiscal", "pep", "ceis", "cepim", "cnep", "acordo_leni\u00eancia", "ceaf", "pgfn-fgts", "pgfn-sida", "pgfn-prev", "servidor_siape"], "json": "", "lista": "", "listaImagens": ["500px.png", "address-book-o.png", "address-book.png", "address-card-o.png", "address-card.png", "adjust.png", "adn.png", "align-center.png", "align-justify.png", "align-left.png", "align-right.png", "amazon.png", "ambulance.png", "american-sign-language-interpreting.png", "anchor.png", "android.png", "angellist.png", "angle-double-down.png", "angle-double-left.png", "angle-double-right.png", "angle-double-up.png", "angle-down.png", "angle-left.png", "angle-right.png", "angle-up.png", "apple.png", "archive.png", "area-chart.png", "arrow-circle-down.png", "arrow-circle-left.png", "arrow-circle-o-down.png", "arrow-circle-o-left.png", "arrow-circle-o-right.png", "arrow-circle-o-up.png", "arrow-circle-right.png", "arrow-circle-up.png", "arrow-down.png", "arrow-left.png", "arrow-right.png", "arrow-up.png", "arrows-alt.png", "arrows-h.png", "arrows-v.png", "arrows.png", "asl-interpreting.png", "assistive-listening-systems.png", "asterisk.png", "at.png", "audio-description.png", "automobile.png", "backward.png", "balance-scale.png", "ban.png", "bandcamp.png", "bank.png", "bar-chart-o.png", "bar-chart.png", "barcode.png", "bars.png", "bath.png", "bathtub.png", "battery-0.png", "battery-1.png", "battery-2.png", "battery-3.png", "battery-4.png", "battery-empty.png", "battery-full.png", "battery-half.png", "battery-quarter.png", "battery-three-quarters.png", "battery.png", "bed.png", "beer.png", "behance-square.png", "behance.png", "bell-o.png", "bell-slash-o.png", "bell-slash.png", "bell.png", "bicycle.png", "binary.png", "binoculars.png", "birthday-cake.png", "bitbucket-square.png", "bitbucket.png", "bitcoin.png", "black-tie.png", "blind.png", "bluetooth-b.png", "bluetooth.png", "bold.png", "bolt.png", "bomb.png", "book.png", "bookmark-o.png", "bookmark.png", "braille.png", "briefcase.png", "btc.png", "bug.png", "building-o.png", "building.png", "bullhorn.png", "bullseye.png", "bus.png", "buysellads.png", "cab.png", "calculator.png", "calendar-check-o.png", "calendar-minus-o.png", "calendar-o.png", "calendar-plus-o.png", "calendar-times-o.png", "calendar.png", "camera-retro.png", "camera.png", "car.png", "caret-down.png", "caret-left.png", "caret-right.png", "caret-square-o-down.png", "caret-square-o-left.png", "caret-square-o-right.png", "caret-square-o-up.png", "caret-up.png", "cart-arrow-down.png", "cart-plus.png", "cc-amex.png", "cc-diners-club.png", "cc-discover.png", "cc-jcb.png", "cc-mastercard.png", "cc-paypal.png", "cc-stripe.png", "cc-visa.png", "cc.png", "certificate.png", "chain-broken.png", "chain.png", "check-circle-o.png", "check-circle.png", "check-square-o.png", "check-square.png", "check.png", "chevron-circle-down.png", "chevron-circle-left.png", "chevron-circle-right.png", "chevron-circle-up.png", "chevron-down.png", "chevron-left.png", "chevron-right.png", "chevron-up.png", "child.png", "chrome.png", "circle-o-notch.png", "circle-o.png", "circle-thin.png", "circle.png", "clipboard.png", "clock-o.png", "clone.png", "close.png", "cloud-download.png", "cloud-upload.png", "cloud.png", "cny.png", "code-fork.png", "code.png", "codepen.png", "codiepie.png", "coffee.png", "cog.png", "cogs.png", "columns.png", "comment-o.png", "comment.png", "commenting-o.png", "commenting.png", "comments-o.png", "comments.png", "compass.png", "compress.png", "connectdevelop.png", "contao.png", "copy.png", "copyright.png", "creative-commons.png", "credit-card-alt.png", "credit-card.png", "crop.png", "crosshairs.png", "css3.png", "cube.png", "cubes.png", "cut.png", "cutlery.png", "dashboard.png", "dashcube.png", "database.png", "deaf.png", "deafness.png", "dedent.png", "delicious.png", "desktop.png", "deviantart.png", "diamond.png", "digg.png", "dollar.png", "dot-circle-o.png", "download.png", "dribbble.png", "drivers-license-o.png", "drivers-license.png", "dropbox.png", "drupal.png", "edge.png", "edit.png", "eercast.png", "eject.png", "ellipsis-h.png", "ellipsis-v.png", "empire.png", "envelope-o.png", "envelope-open-o.png", "envelope-open.png", "envelope-square.png", "envelope.png", "envira.png", "eraser.png", "etsy.png", "eur.png", "euro.png", "exchange.png", "exclamation-circle.png", "exclamation-triangle.png", "exclamation.png", "expand.png", "expeditedssl.png", "external-link-square.png", "external-link.png", "eye-slash.png", "eye.png", "eyedropper.png", "fa.png", "facebook-f.png", "facebook-official.png", "facebook-square.png", "facebook.png", "fast-backward.png", "fast-forward.png", "fax.png", "feed.png", "female.png", "fighter-jet.png", "file-archive-o.png", "file-audio-o.png", "file-code-o.png", "file-excel-o.png", "file-image-o.png", "file-movie-o.png", "file-o.png", "file-pdf-o.png", "file-photo-o.png", "file-picture-o.png", "file-powerpoint-o.png", "file-sound-o.png", "file-text-o.png", "file-text.png", "file-video-o.png", "file-word-o.png", "file-zip-o.png", "file.png", "files-o.png", "film.png", "filter.png", "fire-extinguisher.png", "fire.png", "firefox.png", "first-order.png", "flag-checkered.png", "flag-o.png", "flag.png", "flag_red.png", "flash.png", "flask.png", "flickr.png", "floppy-o.png", "folder-o.png", "folder-open-o.png", "folder-open.png", "folder.png", "font-awesome.png", "font.png", "fonticons.png", "fort-awesome.png", "forumbee.png", "forward.png", "foursquare.png", "free-code-camp.png", "frown-o.png", "futbol-o.png", "gamepad.png", "gavel.png", "gbp.png", "ge.png", "gear.png", "gears.png", "genderless.png", "get-pocket.png", "gg-circle.png", "gg.png", "gift.png", "git-square.png", "git.png", "github-alt.png", "github-square.png", "github.png", "gitlab.png", "gittip.png", "glass.png", "glide-g.png", "glide.png", "globe.png", "google-plus-circle.png", "google-plus-official.png", "google-plus-square.png", "google-plus.png", "google-wallet.png", "google.png", "graduation-cap.png", "gratipay.png", "grav.png", "group.png", "h-square.png", "hacker-news.png", "hand-grab-o.png", "hand-lizard-o.png", "hand-o-down.png", "hand-o-left.png", "hand-o-right.png", "hand-o-up.png", "hand-paper-o.png", "hand-peace-o.png", "hand-pointer-o.png", "hand-rock-o.png", "hand-scissors-o.png", "hand-spock-o.png", "hand-stop-o.png", "handshake-o.png", "hard-of-hearing.png", "hashtag.png", "hdd-o.png", "header.png", "headphones.png", "heart-o.png", "heart.png", "heartbeat.png", "history.png", "home.png", "hospital-o.png", "hotel.png", "hourglass-1.png", "hourglass-2.png", "hourglass-3.png", "hourglass-end.png", "hourglass-half.png", "hourglass-o.png", "hourglass-start.png", "hourglass.png", "houzz.png", "html5.png", "i-cursor.png", "icone-grafo-conta.png", "icone-grafo-desconhecido.png", "icone-grafo-email.png", "icone-grafo-empresa-estrangeira.png", "icone-grafo-empresa-fundacao.png", "icone-grafo-empresa-individual.png", "icone-grafo-empresa-publica.png", "icone-grafo-empresa.png", "icone-grafo-endereco.png", "icone-grafo-feminino.png", "icone-grafo-file.png", "icone-grafo-id.png", "icone-grafo-masculino.png", "icone-grafo-telefone.png", "icone-grafo-ug.png", "id-badge.png", "id-card-o.png", "id-card.png", "ils.png", "image.png", "imdb.png", "inbox.png", "indent.png", "industry.png", "info-circle.png", "info.png", "inr.png", "instagram.png", "institution.png", "internet-explorer.png", "intersex.png", "ioxhost.png", "italic.png", "joomla.png", "jpy.png", "jsfiddle.png", "key.png", "keyboard-o.png", "krw.png", "language.png", "laptop.png", "lastfm-square.png", "lastfm.png", "leaf.png", "leanpub.png", "legal.png", "lemon-o.png", "level-down.png", "level-up.png", "life-bouy.png", "life-buoy.png", "life-ring.png", "life-saver.png", "lightbulb-o.png", "line-chart.png", "link.png", "linkedin-square.png", "linkedin.png", "linode.png", "linux.png", "list-alt.png", "list-ol.png", "list-ul.png", "list.png", "location-arrow.png", "lock.png", "long-arrow-down.png", "long-arrow-left.png", "long-arrow-right.png", "long-arrow-up.png", "low-vision.png", "magic.png", "magnet.png", "mail-forward.png", "mail-reply-all.png", "mail-reply.png", "male.png", "map-marker.png", "map-o.png", "map-pin.png", "map-signs.png", "map.png", "mars-double.png", "mars-stroke-h.png", "mars-stroke-v.png", "mars-stroke.png", "mars.png", "maxcdn.png", "meanpath.png", "medium.png", "medkit.png", "meetup.png", "meh-o.png", "mercury.png", "microchip.png", "microphone-slash.png", "microphone.png", "minus-circle.png", "minus-square-o.png", "minus-square.png", "minus.png", "mixcloud.png", "mobile-phone.png", "mobile.png", "modx.png", "money.png", "moon-o.png", "mortar-board.png", "motorcycle.png", "mouse-pointer.png", "music.png", "navicon.png", "neuter.png", "newspaper-o.png", "object-group.png", "object-ungroup.png", "odnoklassniki-square.png", "odnoklassniki.png", "opencart.png", "openid.png", "opera.png", "optin-monster.png", "outdent.png", "pagelines.png", "paint-brush.png", "paper-plane-o.png", "paper-plane.png", "paperclip.png", "paragraph.png", "paste.png", "pause-circle-o.png", "pause-circle.png", "pause.png", "paw.png", "paypal.png", "pencil-square-o.png", "pencil-square.png", "pencil.png", "percent.png", "phone-square.png", "phone.png", "photo.png", "picture-o.png", "pie-chart.png", "pied-piper-alt.png", "pied-piper-pp.png", "pied-piper.png", "pinterest-p.png", "pinterest-square.png", "pinterest.png", "plane.png", "play-circle-o.png", "play-circle.png", "play.png", "plug.png", "plus-circle.png", "plus-square-o.png", "plus-square.png", "plus.png", "podcast.png", "power-off.png", "print.png", "product-hunt.png", "puzzle-piece.png", "python-color.png", "python.png", "qq.png", "qrcode.png", "question-circle-o.png", "question-circle.png", "question.png", "quora.png", "quote-left.png", "quote-right.png", "ra.png", "random.png", "ravelry.png", "rebel.png", "recycle.png", "reddit-alien.png", "reddit-square.png", "reddit.png", "refresh.png", "registered.png", "remove.png", "renren.png", "reorder.png", "repeat.png", "reply-all.png", "reply.png", "resistance.png", "retweet.png", "rmb.png", "road.png", "rocket.png", "rotate-left.png", "rotate-right.png", "rouble.png", "rss-square.png", "rss.png", "rub.png", "ruble.png", "rupee.png", "s15.png", "safari.png", "save.png", "scissors.png", "scribd.png", "search-minus.png", "search-plus.png", "search.png", "sellsy.png", "send-o.png", "send.png", "server.png", "share-alt-square.png", "share-alt.png", "share-square-o.png", "share-square.png", "share.png", "shekel.png", "sheqel.png", "shield.png", "ship.png", "shirtsinbulk.png", "shopping-bag.png", "shopping-basket.png", "shopping-cart.png", "shower.png", "sign-in.png", "sign-language.png", "sign-out.png", "signal.png", "signing.png", "simplybuilt.png", "sitemap.png", "skyatlas.png", "skype.png", "slack.png", "sliders.png", "slideshare.png", "smile-o.png", "snapchat-ghost.png", "snapchat-square.png", "snapchat.png", "snowflake-o.png", "soccer-ball-o.png", "sort-alpha-asc.png", "sort-alpha-desc.png", "sort-amount-asc.png", "sort-amount-desc.png", "sort-asc.png", "sort-desc.png", "sort-down.png", "sort-numeric-asc.png", "sort-numeric-desc.png", "sort-up.png", "sort.png", "soundcloud.png", "space-shuttle.png", "spinner.png", "spoon.png", "spotify.png", "square-o.png", "square.png", "stack-exchange.png", "stack-overflow.png", "star-half-empty.png", "star-half-full.png", "star-half-o.png", "star-half.png", "star-o.png", "star.png", "steam-square.png", "steam.png", "step-backward.png", "step-forward.png", "stethoscope.png", "sticky-note-o.png", "sticky-note.png", "stop-circle-o.png", "stop-circle.png", "stop.png", "street-view.png", "strikethrough.png", "stumbleupon-circle.png", "stumbleupon.png", "subscript.png", "subway.png", "suitcase.png", "sun-o.png", "superpowers.png", "superscript.png", "support.png", "table.png", "tablet.png", "tachometer.png", "tag.png", "tags.png", "tasks.png", "taxi.png", "telegram.png", "television.png", "tencent-weibo.png", "terminal.png", "text-height.png", "text-width.png", "th-large.png", "th-list.png", "th.png", "themeisle.png", "thermometer-0.png", "thermometer-1.png", "thermometer-2.png", "thermometer-3.png", "thermometer-4.png", "thermometer-empty.png", "thermometer-full.png", "thermometer-half.png", "thermometer-quarter.png", "thermometer-three-quarters.png", "thermometer.png", "thumb-tack.png", "thumbs-down.png", "thumbs-o-down.png", "thumbs-o-up.png", "thumbs-up.png", "ticket.png", "times-circle-o.png", "times-circle.png", "times-rectangle-o.png", "times-rectangle.png", "times.png", "tint.png", "toggle-down.png", "toggle-left.png", "toggle-off.png", "toggle-on.png", "toggle-right.png", "toggle-up.png", "trademark.png", "train.png", "transgender-alt.png", "transgender.png", "trash-o.png", "trash.png", "tree.png", "trello.png", "tripadvisor.png", "trophy.png", "truck.png", "try.png", "tty.png", "tumblr-square.png", "tumblr.png", "turkish-lira.png", "tv.png", "twitch.png", "twitter-square.png", "twitter.png", "umbrella.png", "underline.png", "undo.png", "universal-access.png", "university.png", "unlink.png", "unlock-alt.png", "unlock.png", "unsorted.png", "upload.png", "usb.png", "usd.png", "user-circle-o.png", "user-circle.png", "user-md.png", "user-o.png", "user-plus.png", "user-secret.png", "user-times.png", "user.png", "users.png", "vcard-o.png", "vcard.png", "venus-double.png", "venus-mars.png", "venus.png", "viacoin.png", "viadeo-square.png", "viadeo.png", "video-camera.png", "vimeo-square.png", "vimeo.png", "vine.png", "vk.png", "volume-control-phone.png", "volume-down.png", "volume-off.png", "volume-up.png", "warning.png", "wechat.png", "weibo.png", "weixin.png", "whatsapp.png", "wheelchair-alt.png", "wheelchair.png", "wifi.png", "wikipedia-w.png", "window-close-o.png", "window-close.png", "window-maximize.png", "window-minimize.png", "window-restore.png", "windows.png", "won.png", "wordpress.png", "wpbeginner.png", "wpexplorer.png", "wpforms.png", "wrench.png", "xing-square.png", "xing.png", "y-combinator-square.png", "y-combinator.png", "yahoo.png", "yc-square.png", "yc.png", "yelp.png", "yen.png", "yoast.png", "youtube-play.png", "youtube-square.png", "youtube.png"], "mensagem": "BASE DE TESTE COM NOMES EMBARALHADOS. N\u00c3O \u00c9 POSS\u00cdVEL FAZER BUSCA POR NOMES, APENAS INSER\u00c7\u00c3O DE TESTE (VAZIO E OK NA JANELA DE INSER\u00c7\u00c3O)\n", "mobile": false, "referenciaBD": "TESTE", "referenciaBDCurto": "TESTE", "usuarioLocal": true};;
@@ -34,55 +28,16 @@ graphStore.listaImagens = ["500px.png", "address-book-o.png", "address-book.png"
 graphStore.itensFlag = ["situacao_fiscal", "pep", "ceis", "cepim", "cnep", "acordo_leni\u00eancia", "ceaf", "pgfn-fgts", "pgfn-sida", "pgfn-prev", "servidor_siape"];
 graphStore.usuarioLocal = window.location.href.startsWith('http://127.0.0.1')
 
-//var baseImagem = '/imagem/';
-var gdebug = null;
 var defs = null;
-var menu = null;
 var LF = String.fromCharCode(10);
 var itensDefault;
 
-graphStore.markerSeta = Viva.Graph.svg('marker')
-	.attr('id', 'Triangle')
-	.attr('viewBox', '0 0 10 10')
-	.attr('refX', '10')
-	.attr('refY', '5')
-	.attr('markerUnits', 'strokeWidth')
-	.attr('markerWidth', '10')
-	.attr('markerHeight', '5')
-	.attr('orient', 'auto')
-	.attr('stroke', 'gray')
-	.attr('fill', 'gray');
-
-graphStore.markerSeta.append('path').attr('d', 'M 0 0 L 10 5 L 0 10 z');
-
-graphStore.graphics.getSvgRoot().id = 'principal_svg';
-
-
-var defs = graphStore.graphics.getSvgRoot().append('defs');
-defs.innerHTML = ' \
-	<filter id="filtroPB"> \
-	<feColorMatrix \
-	  type="matrix" \
-	  values="0 1 0 0 0 \
-			  0 1 0 0 0 \
-			  0 1 0 0 0 \
-			  0 1 0 1 0 "/> \
-	</filter>\
-	<filter id="filtroNegativo"> \
-	<feColorMatrix type="matrix" \
-	values="-1  0  0 0 0  0 -1  0 0 0 0 0 -1 0 0 1 1 1 0 0"/>\
-	</filter> \
-	';
-defs.append(graphStore.markerSeta);	
-
-
+	
 
 function dcopy(objetoIn) {
 	// substituir por https://developer.mozilla.org/en-US/docs/Web/API/structuredClone
 	return JSON.parse(JSON.stringify(objetoIn));
 }
-
-
 
 function checkImage(imageSrc, fgood, fbad) {
 	var img = new Image();
@@ -164,10 +119,6 @@ function faviconNoId(noid, urlImage) {
 	);
 } //.function faviconNoId
 
-
-
-
-
 function embaralhaTexto(t) {
 	const shuffle = str => [...str].sort(()=>Math.random()-.5).join('');
 	var lista = [];
@@ -181,164 +132,6 @@ function embaralhaTexto(t) {
 	return lista.join(' ');
 } //.function embaralhaTexto
 
-graphStore.AreaSelecaoRetangular = {
-	Setup:function() {
-		/*seleção retangular */
-		var multiSelectOverlay;
-		document.addEventListener('keydown', function(e) {
-			if (e.which === 17 && !multiSelectOverlay) { // ctrl key
-				multiSelectOverlay = graphStore.AreaSelecaoRetangular.startMultiSelect(graph, graphStore.renderer, graphStore.layout);
-			}
-			if (e.which != 17 && multiSelectOverlay) { // pressionou outro botão (corrige problema quando se pressiona CTRL+botão para outro comando, que o tipo de cursor não mudava para o padrão
-				multiSelectOverlay.destroy();
-				multiSelectOverlay = null;
-			}
-
-		});
-		document.addEventListener('keyup', function(e) {
-			if (e.which === 17 && multiSelectOverlay) {
-				multiSelectOverlay.destroy();
-				multiSelectOverlay = null;
-			}
-		});
-	}, startMultiSelect: function(graph, renderer, layout) {
-		var graphics = renderer.getGraphics();
-		var domOverlay = document.querySelector('.graph-overlay');
-		var overlay = graphStore.AreaSelecaoRetangular.createOverlay(domOverlay);
-		overlay.onAreaSelected(handleAreaSelected);
-	  
-		return overlay;
-
-		function handleAreaSelected(area) {
-			// For the sake of this demo we are using silly O(n) implementation.
-			// Could be improved with spatial indexing if required.
-			var topLeft = graphStore.graphics.transformClientToGraphCoordinates({
-			  x: area.x,
-			  y: area.y
-			});
-
-		var bottomRight = graphStore.graphics.transformClientToGraphCoordinates({
-			x: area.x + area.width,
-			y: area.y + area.height
-		});
-
-		graphStore.graph.forEachNode(higlightIfInside);
-		renderer.rerender();
-
-		return;
-
-		function higlightIfInside(node) {
-			var nodeUI = graphStore.graphics.getNodeUI(node.id);
-			if (isInside(node.id, topLeft, bottomRight)) {
-				graphStore.selecionaNoid(node.id, true, true);
-			}
-		}
-		 
-		function isInside(nodeId, topLeft, bottomRight) {
-			var nodePos = layout.getNodePosition(nodeId);
-			return ((topLeft.x < nodePos.x) && (nodePos.x < bottomRight.x) &&
-				(topLeft.y < nodePos.y) && (nodePos.y < bottomRight.y));
-		}
-	  }
-	}, createOverlay: function(overlayDom) {
-		var selectionClasName = 'graph-selection-indicator';
-		var selectionIndicator = overlayDom.querySelector('.' + selectionClasName);
-		if (!selectionIndicator) {
-			selectionIndicator = document.createElement('div');
-			selectionIndicator.className = selectionClasName;
-			overlayDom.appendChild(selectionIndicator);
-		}	
-
-		var notify = [];
-		var dragndrop = Viva.Graph.Utils.dragndrop(overlayDom);
-		var selectedArea = {
-			x: 0,
-			y: 0,
-			width: 0,
-			height: 0
-		};
-		var startX = 0;
-		var startY = 0;
-
-		dragndrop.onStart(function(e) {
-			startX = selectedArea.x = e.clientX;
-			startY = selectedArea.y = e.clientY;
-			selectedArea.width = selectedArea.height = 0;
-			updateSelectedAreaIndicator();
-			selectionIndicator.style.display = 'block';
-		});
-
-		dragndrop.onDrag(function(e) {
-			recalculateSelectedArea(e);
-			updateSelectedAreaIndicator();
-			notifyAreaSelected();
-		});
-
-		dragndrop.onStop(function() {
-			selectionIndicator.style.display = 'none';
-		});
-
-		overlayDom.style.display = 'block';
-
-		return {
-			onAreaSelected: function(cb) {
-				notify.push(cb);
-			},
-			destroy: function () {
-				overlayDom.style.display = 'none';
-				dragndrop.release();
-			}
-		};
-
-		function notifyAreaSelected() {
-			notify.forEach(function(cb) {
-				cb(selectedArea);
-			});
-		}
-
-		function recalculateSelectedArea(e) {
-			var bcr = document.getElementById('principal').getBoundingClientRect();
-			selectedArea.width = Math.abs(e.clientX - startX);
-			selectedArea.height = Math.abs(e.clientY - startY);
-			selectedArea.x = Math.min(e.clientX, startX)- bcr.x;
-			selectedArea.y = Math.min(e.clientY, startY)- bcr.y;
-		}
-
-		function updateSelectedAreaIndicator() {
-			var bcr = document.getElementById('principal').getBoundingClientRect();
-			selectionIndicator.style.left = (selectedArea.x) + 'px';
-			selectionIndicator.style.top = (selectedArea.y) + 'px';
-			selectionIndicator.style.width = selectedArea.width + 'px';
-			selectionIndicator.style.height = selectedArea.height + 'px';
-		}	
-	}
-}
-
-
-
-
-
-
-
-function menu_botao_caminhos() {
-	if (graphStore.idNosSelecionados.size<2) {
-		alertify.error('Para usar a rotina de caminhos, deve haver ao menos dois itens selecionados. Faça shift+click para selecionar mais itens.');
-		return false;
-	}
-	var camada = prompt('Digite a camada a procurar. A camada é a partir de cada item, por isso pode encontrar caminhos até o dobro de camada. O valor máximo é 5. Se não encontrar caminho com os itens no gráfico, procura mais dados no servidor.', 3);
-	if (camada===null) {
-		return false;
-	}
-	camada = parseInt(camada); 
-	if (!camada) {
-		return
-	}
-	if (camada>5) {
-		alert('Utilize camada abaixo de 5');
-		return false;
-	}
-	graphStore.menu_caminhos(camada, '', false);
-} //. function menu_botao_caminhos
 
 function menu_localiza_CaminhosEntreitensComNotas(criterioCaminhos) {
 	if (graphStore.idNosSelecionados.size<=1) {
@@ -415,13 +208,6 @@ function menu_localiza_itensComNotas(bMensagem) {
 	}
 } //.function menu_localiza_itensComNotas
 
-function reativarLayout() {
-	if (graphStore.layout_suspenso) {
-		graphStore.renderer.resume();
-		graphStore.layout_suspenso = false;
-	}
-} //.function reativarLayout
-
 function dadosEmHtmlPJ(d, noData) {
 	//for (var i of Object.entries(graphStore.json)) {
 	//	texto += '<b>' + i[0] + ':<b> ' + i[1] + '<br> '; }
@@ -464,7 +250,7 @@ function dadosEmHtmlPJ(d, noData) {
 } //.dadosEmHtmlPJ
 
 function menu_importarJsonArquivo(evt, tipo) {
-	menuOnClick();
+	menuStore.menuOnClick();
 	if (tipo=='drop') {
 		var files = evt.dataTransfer.files;
 	} else {
@@ -528,54 +314,7 @@ function menu_importarJsonArquivo(evt, tipo) {
 	}
 } //.function menu_importarJsonArquivo
 
-function menu_copiaItensParaOutraAba(bNovaJanela, bFocusNoDestino) { 
-	//cria nova aba (ou não) para copiar itens selecionados. Se não criar nova aba, copia para a última aba selecionada
-	//quando cria uma aba nova (filha), o focus necessariamente fica na aba filha. O parâmetro bFocusNoDestino só funciona quando a aba filha já existe
-	var jsonDados = graphStore.getRedeNosLigacoes(true, null, true);
-	if (!bNovaJanela) {
-		if (!graphStore.abaFilha || !graphStore.abaFilha.inserirJson || graphStore.abaFilha.closed ) {
-			if (!confirm('Não encontrou uma Aba "Filha" aberta. Deseja abrir uma nova aba com os itens selecionados?')) {
-				return;
-			}
-			bNovaJanela = true;
-		}
-	}
-	if (bNovaJanela) {
-		graphStore.abaFilha = window.open(base); 
-	}
-	var tempo = bNovaJanela ? 500 : 10;
-	//graphStore.abaFilha.graphStore.inserirJson(jsonDados, 'itens copiados'); //neste momento a função ainda não foi criada... precisa de um delay
-	setTimeout(function() {
-				copiarItemSelecionadosParaAbaFilha(bNovaJanela, bFocusNoDestino)
-			}, tempo
-	);
-} //.function menu_copiaItensParaOutraAba
 
-function copiarItemSelecionadosParaAbaFilha(bNovaJanela, bFocusNoDestino) { 
-	//ativado por duplo click no botão drag 
-	//copia itens selecionados para nova janela aberta por SHIFT+A
-	if (!graphStore.abaFilha || graphStore.abaFilha.closed || !graphStore.abaFilha.inserirJson  ) { //esta checagem é redundante??
-		alertify.error('Não há outra janela aberta recentemente. Use SHIFT+DUPLO CLICK no botão COPY ou a tecla SHIFT+A para criar uma nova ABA VAZIA ou a tecla A para criar nova aba com os itens selecionados.');
-		return;
-	}
-	var jsonDados = graphStore.getRedeNosLigacoes(true, null, true); //pega itens selecionados
-	try {
-		graphStore.abaFilha.graphStore.inserirJson(jsonDados, 'itens copiados da Aba "Mãe"', true); 
-		if (bNovaJanela) {
-			graphStore.abaFilha.alertify.warning('Pressionando o botão COPY na Aba "Mãe" copiará outros itens para esta Aba "Filha".');
-		}
-		alertify.success('Os itens selecionados foram copiados para a outra aba.');
-		if (bFocusNoDestino) {
-			graphStore.abaFilha.focus();
-		}
-	} catch (error) {
-		alertify.error('Erro. Nâo copiou itens para outra aba.');
-		if (bNovaJanela) {
-			graphStore.abaFilha.close();
-			graphStore.abaFilha = null;		
-		}
-	}
-} //.function copiarItemSelecionadosParaAbaFilha
 
 function exportaArquivoServidor(arquivo) { 
 	//https://stackoverflow.com/questions/5587973/javascript-upload-file
@@ -739,93 +478,9 @@ function menu_importaJSONServidor(idArquivoServidor, bNaoConfirma, bApaga) {
 	}
 } //.function menu_importaJSONServidor
 
-function menu_salvaJSONNavegador(nomeIn) { //xx5
-	var jsonDados;
-	var ultimoNome = ''
-	jsonDados = graphStore.getRedeNosLigacoes();
-	if (jsonDados.no.length==0) {
-		alertify.error('Não há itens para exportar.');
-		return false;
-	}
-	var arquivosLocais = JSON.parse(localStorage.getItem('jsons'));
-	
-	if (nomeIn) {
-		idArquivo = nomeIn;
-	} else {
-		var tmensagem = 'Digite um nome para salvar no navegador.';
-		if (arquivosLocais) {
-			tmensagem += 'Os seguintes já estão na memória: \n';
-			for (let nome of Object.keys(arquivosLocais))  {
-				tmensagem += nome + '\n';
-				ultimoNome = nome;
-			}
-		}
-		if (!ultimoNome) {
-			ultimoNome = 'rede_local';
-		}	
-		idArquivo =  prompt(tmensagem, ultimoNome);
-		if (!idArquivo) {
-			return false;
-		} else if (Object.keys(arquivosLocais).includes(idArquivo)) {
-			var resp = confirm('O nome ' + idArquivo + ' já está sendo usado. Deseja reescrever?');
-			if (!resp) {
-				return false;
-			}
-		}	
-	}
-		
-	if (!arquivosLocais) {
-		arquivosLocais = {};
-		arquivosLocais[idArquivo] = JSON.parse(JSON.stringify(jsonDados));
-	} else {
-		arquivosLocais[idArquivo] = JSON.parse(JSON.stringify(jsonDados));
-	}
-	localStorage.setItem('jsons', JSON.stringify(arquivosLocais));
-	return true;
-} //.function menu_salvaJSONNavegador
 
-function menu_carregaJSONNavegador(nomeIn) {
-	var jsonDados;
-	var arquivosLocais = JSON.parse(localStorage.getItem('jsons'));
-	if (!arquivosLocais || (Object.keys(arquivosLocais).length==0)) {
-		//arquivosLocais = {};
-		alert('Nâo há arquivos tipo JSON salvos no navegador!');
-		return;
-	}
-	var ultimoNome = '';
-	var tmensagem = 'Digite um nome para carregar. Os seguintes grupos estão na memória: \n';
-	
-	if (nomeIn) {
-		idArquivo = nomeIn;
-	} else {
-		for (let nome of Object.keys(arquivosLocais))  {
-			tmensagem += nome + '\n';
-			ultimoNome = nome;
-		}
-		idArquivo =  prompt(tmensagem, ultimoNome);
-		if (!idArquivo) {
-			return;
-		}
-	}
 
-	var data = arquivosLocais[idArquivo];
-	if (!data) {
-		alertify.error('Não localizou '+ idArquivo + ' no navegador.');
-		return;
-	}
-	graphStore.inserirJson(data, ' Carregou no navegador: ' + idArquivo + '. ', true);
-} //.function carregaJSONNavegador
 
-function menu_botaoAbre(bshift) { //xxx
-	menu_carregaJSONNavegador(bshift ? '': 'salvo_pelo_botao');
-} //.function menu_botaoAbre
-
-function menu_botaoSalva(bshift) { //xxx
-	var r = menu_salvaJSONNavegador(bshift? '': 'salvo_pelo_botao');
-	if (r) {
-		alertify.success('Os itens foram salvos no navegador.');
-	}
-} //.function menu_botaoSalva
 
 function menu_apagaJSONNavegador() {
 	var tmensagem = 'Digite nome para apagar no navegador. Os seguintes conjuntos estão na memória: \n';
@@ -1670,46 +1325,11 @@ function saveTextAsFile(textToSave, nomeArquivo, mime) {   //salva arquivo texto
 	downloadLink.click();
 } //.function saveTextAsFile
 
-function menu_exportaExcel(bSoSelecionados) {
-	menu_exportaArquivo(bSoSelecionados, 'xlsx');
-} //.function menu_exportaExcel(bSoSelecionados)
 
 function menu_exportai2(bSoSelecionados) {
-	menu_exportaArquivo(bSoSelecionados, 'anx');
+	menuStore.menu_exportaArquivo(bSoSelecionados, 'anx');
 } //.function menu_exportai2
 
-function menu_exportaArquivo(bSoSelecionados, tipo, jsonIn) {
-	//jsonIn - se informado, ignora o parametro bSoSelecionados
-	var jsonDados, url;
-	if (jsonIn){ 
-		jsonDados = jsonIn;
-	} else {
-		jsonDados = graphStore.getRedeNosLigacoes(bSoSelecionados);
-	}
-	if (jsonDados['no'].length==0) {
-		alertify.error('Não há itens para exportar.');
-		return;
-	}
-	if (tipo=='xlsx') {
-		url = 'dadosemarquivo/xlsx';
-	} else if (tipo=='anx') {
-		url = 'dadosemarquivo/anx';
-	} else if (tipo=='osm') {
-		if (jsonDados['no'].length>10) {
-			alert('Se houver mais de ' + graphStore.inicio.geocode_max + ' endereços, serão utilizados somente as coordenadas do município dos cnpjs. A api de geolocalização de endereço só é usada com poucos itens, devido à lentidão. Se quiser um mapa com localização precisa, use a rotina com um gráfico menor.');
-		} else {
-			alertify.warning('A rotina de geolocalização usa a api do OpenStreetMaps e irá demorar (1 segundo por endereço).'); 
-		}
-		//url = 'dadosemarquivo/osm';
-		url = 'mapa'
-	} else if (tipo=='json') {
-		url = ''; //'selecao_de_itens';
-	} else {
-		return;
-	}
-	graphStore.openWindowWithPost(jsonDados, url);
-	//iframeAuxiliar.exportaSoSelecionados = bSoSelecionados;
-} //.function menu_exportaArquivo
 
 function menu_salvaJsonArquivo(bSoSelecionados) {
 	var redeItens = graphStore.getRedeNosLigacoes(bSoSelecionados);
@@ -1792,41 +1412,6 @@ function menu_exportaSVG() {
 	saveTextAsFile(getXMLdeSVG(), 'rede_cnpj-'+datahora+'.svg', mime); 
 } //.function menu_exportaSVG
 
-function menu_zoomin(teclaShift, teclaCtrl) {
-	menuOnClick(); //firefox no android, não está fechando o menu
-	if (teclaCtrl) {
-		return;
-	}
-	if (teclaShift) {
-		return menu_configurar_springLength(1);
-	}
-	var vezes = graphStore.mobile?6:3;
-	var escalamax = graphStore.mobile?8:2;
-	if (graphStore.renderer.getTransform().scale>escalamax) {
-		return;
-	}
-	for(var k=0; k<vezes; k++) {
-		var escala = graphStore.renderer.zoomIn();
-		if (escala>escalamax) {
-			break;
-		}
-	}
-} //.function menu_zoomin
-
-function menu_zoomout(teclaShift, teclaCtrl) {
-	menuOnClick(); //firefox no android, não está fechando o menu
-	if (teclaCtrl) {
-		return;
-	}
-	if (teclaShift) {
-		return menu_configurar_springLength(-1);
-	}
-	var vezes = graphStore.mobile?6:2;
-	for(var k=0; k<vezes; k++) {
-		var escala = graphStore.renderer.zoomOut();
-	}
-} //.function menu_zoomout
-
 function menu_input_cnpj(elemento) {
     if(event.key === 'Enter') {
 		graphStore.inserirDefault = elemento.value;
@@ -1867,23 +1452,7 @@ function menu_configurar_nodeSize() {
 	}); 
 } //.function menu_configurar_nodeSize
 
-function menu_configurar_springLength(zoomInOut) {
-	var tamanho = graphStore.layout.simulator.springLength();
-	if (zoomInOut==-1) {
-		graphStore.layout.simulator.springLength(tamanho*0.9);
-		graphStore.springLength = tamanho*0.9;
-	} else if (zoomInOut==1) {
-		graphStore.layout.simulator.springLength(tamanho*1.1);
-		graphStore.springLength = tamanho*1.1;
-	} else {
-		var parametro = prompt('Digite o comprimento da ligação (valor padrão ' + graphStore.springLength + ')', tamanho);
-		if (parametro) {
-			graphStore.layout.simulator.springLength(parametro);
-			graphStore.springLength = parametro;
-		}
-	}
-	graphStore.menu_rendererAtivarParar(true, false); //para atualizar tela
-} //.function menu_configurar_springLength
+
 
 function balanca() {
 //deslocamento para o renderizador atualizar tela, não adianta se renderer estiver parado.
@@ -1921,34 +1490,6 @@ function menu_configurar_theta() {
 		graphStore.layout.simulator.theta(parametro);
 	}
 } //.function menu_configurar_theta(
-
-function hideMenu(){
-	//menu.classList.contains('show-menu') //para verificar
-    menu.classList.remove('show-menu');
-} //.function hideMenu
-
-function menuOnClick(e){
-	//devido a inconsistência no firefox e chrome no android, foi colocado menuOnClick(); antes de todos os comandos do menu
-	hideMenu();
-	document.removeEventListener(graphStore.eventclick, menuOnClick);
-	//window.scrollTo(0,0); //ttt
-} //.function menuOnClick
-
-function menu_botao(event) {
-	event.preventDefault();
-	// menu funciona no chrome do android mas não no firefox (não fecha o menu)
-	if (graphStore.mobile) {
-		graphStore.showMenu(7,80);
-	} else {
-		graphStore.showMenu(7,30);
-	}
-	setTimeout(function(){
-        document.addEventListener(graphStore.eventclick, menuOnClick, false);
-	},1000);
-	event.preventDefault();
-	return false;
-} //.function menu_botao
-//.menu contextual
 
 //resposta a evento drop no div do menu, para abrir opção de inserção. Por exemplo, arrastar do word ou excel uma lista de cnpjs.
 function dragover_handler(ev) {
@@ -1995,74 +1536,8 @@ function drop_handler(ev) {
 	}
 } //.function drop_handler
 
-function drag_handler(ev) {
-	ev.dataTransfer.setData("rede_json", JSON.stringify(graphStore.getRedeNosLigacoes(true, null, true))); //terceiro parametro true=bsemposicao
-	var texto = [...graphStore.idNosSelecionados].join('\n');
-	ev.dataTransfer.setData("text/plain", texto);
-	
-	var linksArray = [];
-	for (let item of graphStore.idNosSelecionados) {
-		if (item.startsWith('LI_')) { 
-			linksArray.push(item.substr(3));
-		}
-	}
-	if (linksArray.length>0) {
-		ev.dataTransfer.setData("text/x-moz-url", linksArray.join('\n'));
-		ev.dataTransfer.setData("text/uri-list", linksArray.join('\n'));	
-	} else {
-		ev.dataTransfer.setData("text/uri-list", base + 'grafico/1/'+ texto.replaceAll('\n', ';')); //arrastando para uma outra aba que não seja da redecnpj, abre o gráfico dos itens selecionados
-	}
-	return;
-	/*
-	if (graphStore.idnoSelecionado.startsWith('LI_')) { 
-		texto = graphStore.idnoSelecionado.substr(3);
-		ev.dataTransfer.setData("text/x-moz-url", texto);
-		ev.dataTransfer.setData("text/uri-list", texto);
-	} else {
-		ev.dataTransfer.setData("text/uri-list", base + 'grafico/1/'+ texto.replaceAll('\n', ';')); //arrastando para uma outra aba que não seja da redecnpj, abre o gráfico dos itens selecionados
-	} 
-	*/
-} //.function drag_handler
 
-var alertifyfake = {
-	'prompt':function(titulo, texto, valor, func1, func2) {
-		menuOnClick(); //firefox no android, não está fechando o menu
-		var resp = 	prompt(titulo+'\n'+texto.replaceAll('<b>','').replaceAll('</b>',''), valor);
-		if (!(resp===null)) {
-			func1(null, resp);
-		} else {
-			func2();
-		};
-	},
-	'confirm':function(titulo, texto, func1,func2) {
-		menuOnClick();
-		var resp = confirm(titulo + '\n' + texto);
-		if (resp) {
-			func1();
-		} else {
-			func2();
-		}
-	},
-	'alert':function(titulo, texto, func) {
-		menuOnClick();
-		//texto = texto.replace(/<b>/g, '').replace(/<\/b>/g, '').replace(/<br>/g, '; ')
-		texto = texto.replace(/<b>/g, '').replace(/<\/b>/g, '').replace(/<br>/g, '\n')
-		setTimeout(function(){ alert(titulo + '\n\n' + texto);}, 500);	
-		func();
-	},
-	'success':function(texto) {
-		menuOnClick();
-		setTimeout(function(){ alert(texto);}, 500);
-	},
-	'warning':function(texto) {
-		menuOnClick();
-		setTimeout(function(){ alert('ATENÇÃO!!! ' + texto); }, 500);
-	},
-	'error':function(texto) {
-		menuOnClick();
-		setTimeout(function(){ alert('ERRO!!! ' + texto); }, 500);
-	}
-} //.alertifyfake
+
 
 
 graphStore.main();

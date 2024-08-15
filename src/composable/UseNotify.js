@@ -1,6 +1,6 @@
 import { Notify } from 'quasar';
 
-export default function userNotify() {
+export default function useNotify() {
     const success = (msg) => {
         Notify.create({
             type: 'positive',
@@ -15,6 +15,12 @@ export default function userNotify() {
     };
     const alert = (msg) => {
         Notify.create({
+            type: 'info',
+            message: msg
+        })
+    };
+    const warning = (msg) => {
+        Notify.create({
             type: 'warning',
             message: msg
         })
@@ -26,6 +32,7 @@ export default function userNotify() {
         success,
         error,
         alert,
+        warning,
         confirm
     }
 }
